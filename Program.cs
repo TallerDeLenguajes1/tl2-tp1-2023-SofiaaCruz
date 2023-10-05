@@ -6,12 +6,35 @@ using EspacioLecturaArchivos;
 using System.Threading.Tasks.Dataflow;
 
 string? op;
-int i=1, numPedido = 0, x = 0;
+int i=1, numPedido = 0, opArchivo;
+List<Cadete>? ListCadete;
+List<Cadeteria>? ListCadeteria;
 
-List<Pedido> ListPedido = new List<Pedido>();
-LecturaArchivos Archivo = new LecturaArchivos();
-List<Cadete> ListCadete = Archivo.ArchivoCadete("Cadetes.csv");
-Cadeteria? Cadeteria = Archivo.ArchivoCadeteria("Cadeterias.csv", ListCadete);
+Console.Write("Elija el tipo de archivo que desea leer\n1-Csv\n2-Json\n>> ");
+int.TryParse(Console.ReadLine(), out opArchivo);
+while(opArchivo < 1 || opArchivo > 2)
+{
+    Console.Write("Debe elegir una opción valida\n>> ");
+    int.TryParse(Console.ReadLine(), out opArchivo);
+}
+if(opArchivo == 1)
+{
+    ArchivosCsv Archivo = new ArchivosCsv();
+    ListCadete = Archivo.ArchivoCadete("Cadetes.csv");
+    ListCadeteria = Archivo.ArchivoCadeteria("Cadeteria.csv");
+}
+else
+{
+    ArchivosJson Archivo = new ArchivosJson();
+    ListCadete = Archivo.ArchivoCadete("Cadetes.json");
+    ListCadeteria = Archivo.ArchivoCadeteria("Cadeteria.json");
+}
+Cadeteria? Cadeteria = null;
+if(ListCadeteria!= null)
+{
+    Cadeteria = ListCadeteria[0];
+    Cadeteria.agregarCadete(ListCadete);
+}
 
 if(Cadeteria != null){
     do
@@ -80,17 +103,15 @@ if(Cadeteria != null){
                     i=1;
                     Cadete cadeteElegido = ListCadete[eleccionCad-1];
                     int Idcad = cadeteElegido.Id;
-                    Cadeteria.DarDeAltaPedido(numPedido, observacion, NuevoCliente, Idcad);
-                    x = cadeteElegido.ListadoPedido.Count;
-                    ListPedido.Add(cadeteElegido.ListadoPedido[x-1]);
+                    Cadeteria.DarDeAltaPedido(numPedido, observacion, NuevoCliente, cadeteElegido.Id);
                     eleccionCad = 0;
                     numPedido++;
 
                 break;
                 case "2": 
                     Console.WriteLine("--------Elija el pedido que desea reasignar--------");
-                    int eleccionped = EleccionPedido();
-                    Pedido PedidoElegido = ListPedido[eleccionped];
+                    int eleccionped = EleccionPedido(Cadeteria);
+                    Pedido PedidoElegido = Cadeteria.ListadoPedidos[eleccionped];
                     int j=0;
                     Console.WriteLine("--------Ahora elija al cadete que le asignara el pedido---------");
                     foreach(var cad in ListCadete)
@@ -104,7 +125,8 @@ if(Cadeteria != null){
                         Console.WriteLine("Error, debe elegir una opcion valida");
                         int.TryParse(Console.ReadLine(), out eleccionCad);
                     }
-                    Cadeteria.ReasignarPedido(PedidoElegido, eleccionCad);
+                    cadeteElegido = ListCadete[eleccionCad-1];
+                    Cadeteria.AsignarCadeteAPedido(cadeteElegido.Id, PedidoElegido.Numero);
                 break;
                 case "3": 
                     Console.Write("Que desea relizar?\n1-Cambiar Estado\n2-Cancelar\n>> ");
@@ -125,10 +147,9 @@ if(Cadeteria != null){
                         aux = "cancelar";
                     }
                     Console.WriteLine($"--------Elija el pedido que desea {aux}---------");
-                    eleccionped = EleccionPedido();
-                    PedidoElegido = ListPedido[eleccionped];
-                    Console.WriteLine($"{Cadeteria.CambiarEstadoPedido(PedidoElegido, eleccionEstado)}");
-                    ListPedido.Remove(PedidoElegido);
+                    eleccionped = EleccionPedido(Cadeteria);
+                    PedidoElegido = Cadeteria.ListadoPedidos[eleccionped];
+                    Console.WriteLine($"{Cadeteria.CambiarEstadoPedido(PedidoElegido.Numero, eleccionEstado)}");
                     
                 break;
                 case "4": 
@@ -142,12 +163,13 @@ if(Cadeteria != null){
     }while(op != "0");
 }
 
-int EleccionPedido()
+int EleccionPedido(Cadeteria cadeteria)
 {
     int j = 0;
-    foreach(var ped in ListPedido)
+    foreach(var ped in cadeteria.ListadoPedidos)
     {
-        Console.WriteLine($"----Pedido N° {ped.Numero}----");
+        Console.WriteLine($"\n----Pedido N° {ped.Numero}----");
+        Console.WriteLine($"{ped.MostrarDatosDePedido()}");
         j++;
     }
     int eleccionped;
