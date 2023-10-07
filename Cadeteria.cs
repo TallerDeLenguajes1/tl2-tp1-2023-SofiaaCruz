@@ -104,17 +104,37 @@ public class Cadeteria
         }
         return total;
     }
-    public void MostrarInforme()
+    public string MostrarInforme(int id)
     {
-        float total = 0;
-        foreach(var cad in listadoCadetes)
+        Cadete? cadeteElegido = listadoCadetes.Find(cad => cad.Id == id);
+        if(cadeteElegido != null)
+        {
+            return ($"Cadete N° {cadeteElegido.Id}\nNombre: {cadeteElegido.Nombre}\nPedidos entregados: {JornalACobrar(cadeteElegido.Id)/500}\nPedidos pendiente: {pedidosPendientes(cadeteElegido.Id)}\nJornal a cobrar: ${JornalACobrar(cadeteElegido.Id)}");
+        }
+        else
+        {
+            return "";
+        }
+        /*foreach(var cad in listadoCadetes)
         {
             Console.WriteLine($"--Cadete N° {cad.Id}--\nNombre: {cad.Nombre}\nPedidos entregados: {JornalACobrar(cad.Id)/500}\nPedidos pendientes: {pedidosPendientes(cad.Id)}\nJornal a cobrar: ${JornalACobrar(cad.Id)}\n\n");
             total+= JornalACobrar(cad.Id);
         }
-        Console.WriteLine($"-----------------Nomina total: {total}");
+        Console.WriteLine($"-----------------Nomina total: {total}"); */
     } 
 
+    public float NominaTotal()
+    {
+        float total = 0;
+        foreach(var ped in listadoPedidos)
+        {
+            if(ped.Estado == estadoPedido.entregado)
+            {
+                total+=500;
+            }
+        }
+        return total;
+    }
     public void agregarCadete(List<Cadete> listadoCadetes)
     {
         this.listadoCadetes = listadoCadetes;

@@ -30,13 +30,13 @@ else
     ListCadeteria = Archivo.ArchivoCadeteria("Cadeteria.json");
 }
 Cadeteria? Cadeteria = null;
-if(ListCadeteria!= null)
+if(ListCadeteria!= null && ListCadete != null)
 {
     Cadeteria = ListCadeteria[0];
     Cadeteria.agregarCadete(ListCadete);
 }
 
-if(Cadeteria != null){
+if(Cadeteria != null && ListCadete != null){
     do
     {
         
@@ -154,7 +154,11 @@ if(Cadeteria != null){
                 break;
                 case "4": 
                     Console.WriteLine("\n--------Informe de cadeteria--------");
-                    Cadeteria.MostrarInforme();
+                    foreach(var cad in Cadeteria.ListadoCadetes)
+                    {
+                        Console.WriteLine($"\n{Cadeteria.MostrarInforme(cad.Id)}");
+                    }
+                    Console.WriteLine($"\n---------------Nomina Total:{Cadeteria.NominaTotal()}");
                 break;
                 case "0": 
                 break;
