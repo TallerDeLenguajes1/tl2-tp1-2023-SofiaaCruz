@@ -33,7 +33,7 @@ Cadeteria? Cadeteria = null;
 if(ListCadeteria!= null && ListCadete != null)
 {
     Cadeteria = ListCadeteria[0];
-    Cadeteria.agregarCadete(ListCadete);
+    Cadeteria.ListadoCadetes = ListCadete;
 }
 
 if(Cadeteria != null && ListCadete != null){

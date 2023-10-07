@@ -135,8 +135,4 @@ public class Cadeteria
         }
         return total;
     }
-    public void agregarCadete(List<Cadete> listadoCadetes)
-    {
-        this.listadoCadetes = listadoCadetes;
-    }
 }
